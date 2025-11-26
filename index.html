@@ -21,61 +21,99 @@
         body { font-family: 'Poppins', sans-serif; background-color: #f1f5f9; -webkit-tap-highlight-color: transparent; }
         ::-webkit-scrollbar { width: 0px; background: transparent; }
         
-        /* Animations */
-        .fade-in { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .slide-in { animation: slideIn 0.2s ease-out forwards; }
+        .slide-in { animation: slideIn 0.3s ease-out forwards; }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
 
+        .modal-up { animation: slideUp 0.3s ease-out forwards; }
+        @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .highlight-chat { background-color: #fff1f2; border-left: 4px solid #E11D48; }
+        
         /* Components */
         .splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #E11D48; display: flex; justify-content: center; align-items: center; flex-direction: column; z-index: 100; }
-        .loader { border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #E11D48; width: 20px; height: 20px; animation: spin 1s linear infinite; display: none; }
         .loader-inline { border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #E11D48; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; }
         
-        .blood-card { background: #FFF1F2; border-left: 5px solid #E11D48; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .blood-card { background: white; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; transition: all 0.2s; position: relative; overflow: hidden; }
+        .blood-card:active { transform: scale(0.98); }
+        .blood-card.completed { border-left: 5px solid #10b981; background: #ecfdf5; }
+        .blood-card.active { border-left: 5px solid #E11D48; }
+
+        .chat-bubble-me { background: linear-gradient(to right, #E11D48, #be123c); color: white; border-radius: 18px 18px 0 18px; max-width: 75%; padding: 10px 14px; font-size: 14px; }
+        .chat-bubble-other { background-color: #ffffff; color: #1f2937; border-radius: 18px 18px 18px 0; max-width: 75%; padding: 10px 14px; font-size: 14px; border: 1px solid #f3f4f6; }
         
-        .chat-bubble-me { background-color: #E11D48; color: white; border-radius: 18px 18px 0 18px; max-width: 75%; padding: 8px 12px; font-size: 14px; }
-        .chat-bubble-other { background-color: #ffffff; color: #1f2937; border-radius: 18px 18px 18px 0; max-width: 75%; padding: 8px 12px; font-size: 14px; border: 1px solid #e5e7eb; }
+        .achievement-card { background: white; border-radius: 16px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid #f0fdf4; }
+        .achievement-card.locked { opacity: 0.6; filter: grayscale(1); }
         
-        /* Mobile Nav Fix */
-        .mobile-nav { position: fixed; bottom: 0; left: 0; width: 100%; padding-bottom: env(safe-area-inset-bottom); background: white; border-top: 1px solid #f3f4f6; z-index: 40; }
+        /* FIXED NAV BAR */
+        .mobile-nav { 
+            position: absolute; 
+            bottom: 0; 
+            left: 0; 
+            width: 100%; 
+            background: rgba(255,255,255,0.98); 
+            border-top: 1px solid #f3f4f6; 
+            z-index: 50; 
+            padding-bottom: env(safe-area-inset-bottom);
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .nav-btn { position: relative; height: 100%; width: 20%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .nav-badge { 
+            position: absolute; 
+            top: 8px; 
+            right: 28%; 
+            background: #E11D48; 
+            color: white; 
+            font-size: 9px; 
+            font-weight: bold;
+            width: 16px; 
+            height: 16px; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border: 2px solid white; 
+            z-index: 20;
+        }
 
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="bg-gray-100 h-screen w-full flex justify-center overflow-hidden">
+<body class="bg-slate-100 h-screen w-full flex justify-center items-center overflow-hidden">
 
-    <div class="w-full max-w-md h-full bg-white relative shadow-2xl md:rounded-[30px] md:h-[95vh] md:my-auto overflow-hidden flex flex-col">
+    <!-- Main Container -->
+    <div class="w-full h-full sm:max-w-md sm:h-[95vh] bg-white relative shadow-2xl sm:rounded-[30px] overflow-hidden flex flex-col">
 
-        <!-- 1. SPLASH SCREEN -->
-        <div id="splash" class="splash-screen">
-            <div class="bg-white p-5 rounded-full mb-4 animate-bounce shadow-xl"><i class="fa-solid fa-hand-holding-droplet text-5xl text-rose-600"></i></div>
+        <!-- SPLASH -->
+        <div id="splash" class="absolute inset-0 z-[100] bg-rose-600 flex flex-col justify-center items-center">
+            <div class="bg-white p-6 rounded-full mb-4 animate-bounce shadow-xl"><i class="fa-solid fa-hand-holding-droplet text-6xl text-rose-600"></i></div>
             <h1 class="text-white text-3xl font-bold tracking-wider">Life Share BD</h1>
             <p class="text-white opacity-90 text-sm mt-2">Loading...</p>
         </div>
 
-        <!-- 2. AUTH PAGE -->
+        <!-- AUTH -->
         <div id="auth-page" class="absolute inset-0 z-40 bg-white flex flex-col justify-center p-8 hidden">
             <div class="text-center mb-8">
                 <i class="fa-solid fa-heart-pulse text-rose-600 text-6xl mb-3"></i>
                 <h2 class="text-3xl font-bold text-gray-800">Welcome</h2>
                 <p class="text-gray-500">Join the life saving community</p>
             </div>
-            
             <div class="flex bg-gray-100 p-1 rounded-xl mb-6">
                 <button onclick="switchAuth('login')" id="tab-login" class="flex-1 py-3 rounded-lg text-sm font-bold bg-white shadow text-rose-600 transition">Login</button>
                 <button onclick="switchAuth('register')" id="tab-register" class="flex-1 py-3 rounded-lg text-sm font-bold text-gray-500 transition">Register</button>
             </div>
-
-            <!-- Login -->
             <div id="login-form" class="space-y-4">
                 <input type="email" id="login-email" placeholder="Email Address" class="w-full p-4 bg-gray-50 rounded-xl border border-gray-200 outline-none focus:border-rose-500">
                 <input type="password" id="login-pass" placeholder="Password" class="w-full p-4 bg-gray-50 rounded-xl border border-gray-200 outline-none focus:border-rose-500">
-                <button onclick="handleLogin()" id="btn-login" class="w-full bg-rose-600 text-white py-4 rounded-xl font-bold shadow-lg flex justify-center items-center gap-2"><span>Login</span><div class="loader" id="login-loader"></div></button>
+                <button onclick="handleLogin()" class="w-full bg-rose-600 text-white py-4 rounded-xl font-bold shadow-lg flex justify-center items-center gap-2 hover:bg-rose-700 transition"><span>Login</span><div class="loader-inline hidden" id="login-loader"></div></button>
             </div>
-
-            <!-- Register -->
             <div id="register-form" class="space-y-3 hidden">
                 <input type="text" id="reg-name" placeholder="Full Name" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 outline-none">
                 <input type="email" id="reg-email" placeholder="Email Address" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 outline-none">
@@ -86,21 +124,41 @@
                     <select id="reg-role" class="w-1/2 p-3 bg-gray-50 rounded-xl border border-gray-200 outline-none"><option value="donor">Donor</option><option value="receiver">Receiver</option></select>
                 </div>
                 <select id="reg-thana" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 outline-none thana-select"><option value="">Select Thana</option></select>
-                <button onclick="handleRegister()" id="btn-reg" class="w-full bg-rose-600 text-white py-3 rounded-xl font-bold shadow-lg flex justify-center items-center gap-2"><span>Register</span><div class="loader" id="reg-loader"></div></button>
+                <button onclick="handleRegister()" class="w-full bg-rose-600 text-white py-3 rounded-xl font-bold shadow-lg flex justify-center items-center gap-2 hover:bg-rose-700 transition"><span>Register</span><div class="loader-inline hidden" id="reg-loader"></div></button>
             </div>
         </div>
 
-        <!-- 3. MAIN APP (Navigation & Pages) -->
+        <!-- ADMIN PANEL -->
+        <div id="admin-panel" class="absolute inset-0 z-50 bg-slate-50 flex flex-col hidden">
+            <div class="bg-white p-5 shadow-sm flex justify-between items-center border-b border-gray-200">
+                <div class="flex items-center gap-2"><i class="fa-solid fa-shield-halved text-rose-600 text-xl"></i><h2 class="font-bold text-gray-800">Admin Dashboard</h2></div>
+                <button onclick="handleLogout()" class="text-rose-500 font-bold text-xs bg-rose-50 px-3 py-1.5 rounded-full">Logout</button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-4 space-y-6">
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100"><div class="text-gray-400 text-xs font-bold uppercase mb-1">Total Users</div><div class="text-2xl font-black text-slate-800" id="stat-users">0</div></div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100"><div class="text-gray-400 text-xs font-bold uppercase mb-1">Active Requests</div><div class="text-2xl font-black text-rose-600" id="stat-reqs">0</div></div>
+                </div>
+                <div class="flex bg-gray-200 p-1 rounded-lg">
+                    <button onclick="switchAdminTab('users')" id="adm-tab-users" class="flex-1 py-1.5 text-xs font-bold rounded bg-white shadow text-gray-800 transition">Users</button>
+                    <button onclick="switchAdminTab('reqs')" id="adm-tab-reqs" class="flex-1 py-1.5 text-xs font-bold rounded text-gray-500 transition">Requests</button>
+                </div>
+                <div id="adm-view-users"><h3 class="font-bold text-sm text-gray-700 mb-3">All Users</h3><div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"><div id="admin-users-list" class="divide-y divide-gray-100"></div></div></div>
+                <div id="adm-view-reqs" class="hidden"><h3 class="font-bold text-sm text-gray-700 mb-3">Manage Requests</h3><div id="admin-reqs-list" class="space-y-3"></div></div>
+            </div>
+        </div>
+
+        <!-- MAIN APP -->
         <div id="main-app" class="flex flex-col h-full hidden">
             
             <!-- Header -->
-            <div id="app-header" class="bg-white px-5 py-4 flex justify-between items-center shadow-sm z-10 sticky top-0">
+            <div id="app-header" class="bg-white/90 backdrop-blur-md px-5 py-4 flex justify-between items-center shadow-sm z-30 sticky top-0">
                 <div class="flex items-center gap-2 text-rose-600">
                     <i class="fa-solid fa-hand-holding-droplet text-2xl"></i>
                     <h1 class="font-bold text-lg text-gray-800">Life Share BD</h1>
                 </div>
                 <div class="flex gap-4 text-gray-500">
-                    <i onclick="navTo('page-chats')" class="fa-solid fa-comment-dots text-xl cursor-pointer hover:text-rose-600 transition"></i>
+                    <i onclick="navTo('page-completed')" class="fa-solid fa-clipboard-check text-xl cursor-pointer hover:text-green-600 transition" title="Completed History"></i>
                     <div onclick="navTo('page-notifications')" class="relative cursor-pointer hover:text-rose-600 transition">
                         <i class="fa-solid fa-bell text-xl"></i>
                         <div id="notif-badge" class="hidden absolute -top-1 -right-1 w-2.5 h-2.5 bg-rose-600 rounded-full border border-white"></div>
@@ -108,65 +166,52 @@
                 </div>
             </div>
 
-            <!-- Pages Container (Added padding bottom for fixed nav) -->
+            <!-- Content Area -->
             <div id="content-area" class="flex-1 overflow-y-auto bg-gray-50 relative pb-24">
                 
-                <!-- HOME PAGE -->
+                <!-- HOME -->
                 <div id="page-home" class="p-5 fade-in">
-                    <div class="bg-gradient-to-r from-rose-600 to-rose-500 rounded-[25px] p-6 text-white shadow-lg mb-6">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="text-rose-100 text-sm">Welcome back,</p>
-                                <h2 class="text-2xl font-bold"><span id="user-name-display">User</span></h2>
-                                <div class="flex items-center gap-2 mt-2 bg-white/20 px-3 py-1 rounded-full w-fit backdrop-blur-sm">
-                                    <i class="fa-solid fa-coins text-yellow-300"></i>
-                                    <span id="home-coins" class="font-bold text-sm">0</span>
-                                </div>
-                            </div>
-                            <div class="bg-white/20 p-3 rounded-full"><i class="fa-solid fa-user text-xl"></i></div>
+                    <div class="bg-gradient-to-br from-rose-600 to-pink-600 rounded-[25px] p-6 text-white shadow-lg mb-6 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 blur-xl"></div>
+                        <div class="flex justify-between items-start relative z-10">
+                            <div><p class="text-rose-100 text-sm">Welcome back,</p><h2 class="text-2xl font-bold"><span id="user-name-display">Loading...</span></h2><div class="flex items-center gap-2 mt-2 bg-white/20 px-3 py-1 rounded-full w-fit backdrop-blur-sm border border-white/10"><i class="fa-solid fa-coins text-yellow-300"></i><span id="home-coins" class="font-bold text-sm">0</span></div></div>
+                            <div class="bg-white/20 p-3 rounded-full backdrop-blur-sm"><i class="fa-solid fa-user text-xl"></i></div>
                         </div>
-                        <div class="mt-6 flex gap-3">
+                        <div class="mt-6 flex gap-3 relative z-10">
                             <button onclick="navTo('page-request')" class="flex-1 bg-white text-rose-600 py-3 rounded-xl font-bold text-sm shadow-md active:scale-95 transition">Request Blood</button>
-                            <button onclick="navTo('page-search')" class="flex-1 bg-rose-700/50 text-white py-3 rounded-xl font-bold text-sm border border-white/20 active:scale-95 transition">Search Donor</button>
+                            <button onclick="navTo('page-search')" class="flex-1 bg-rose-800/30 text-white py-3 rounded-xl font-bold text-sm border border-white/20 active:scale-95 transition backdrop-blur-sm">Search Donor</button>
                         </div>
                     </div>
-                    
-                    <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                        <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> Live Blood Feed
-                    </h3>
+                    <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> Active Blood Requests</h3>
                     <div id="feed-list" class="space-y-4"><p class="text-center text-gray-400 mt-10">Loading feed...</p></div>
                 </div>
 
-                <!-- SEARCH PAGE -->
+                <!-- COMPLETED -->
+                <div id="page-completed" class="p-5 hidden fade-in">
+                    <h2 class="font-bold text-xl mb-4 text-green-700 flex items-center gap-2"><i class="fa-solid fa-circle-check"></i> Completed Requests</h2>
+                    <div id="completed-list" class="space-y-4"><div class="loader-inline"></div></div>
+                </div>
+
+                <!-- SEARCH -->
                 <div id="page-search" class="p-5 hidden fade-in">
                     <h2 class="font-bold text-xl mb-4 text-gray-800">Find Donors</h2>
                     <div class="bg-white p-5 rounded-2xl shadow-sm space-y-3">
                         <select id="search-thana" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 outline-none thana-select"><option value="">Select Thana</option></select>
                         <select id="search-blood" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 outline-none"><option value="All">All Blood Groups</option><option value="A+">A+</option><option value="B+">B+</option><option value="AB+">AB+</option><option value="O+">O+</option></select>
-                        <button onclick="searchDonors()" class="w-full bg-rose-600 text-white py-3 rounded-xl font-bold shadow-md mt-2">Search</button>
+                        <button onclick="searchDonors()" class="w-full bg-rose-600 text-white py-3 rounded-xl font-bold shadow-md mt-2 active:scale-95 transition">Search</button>
                     </div>
                     <div id="donors-list" class="mt-6 space-y-3"></div>
                 </div>
 
-                <!-- FEED PAGE -->
-                <div id="page-feed" class="p-5 hidden fade-in">
-                    <h2 class="font-bold text-xl mb-4 text-gray-800">Community Feed</h2>
-                    <div id="feed-list-global" class="space-y-4"><p class="text-center text-gray-400 mt-10">Loading...</p></div>
-                </div>
-
-                <!-- REQUEST PAGE -->
+                <!-- REQUEST -->
                 <div id="page-request" class="p-5 hidden fade-in">
                     <div class="flex bg-white p-1 rounded-xl shadow-sm mb-5">
                         <button onclick="switchReqTab('new')" id="tab-req-new" class="flex-1 py-2 rounded-lg text-xs font-bold bg-rose-100 text-rose-600 transition">New Request</button>
                         <button onclick="switchReqTab('all')" id="tab-req-all" class="flex-1 py-2 rounded-lg text-xs font-bold text-gray-500 transition">My History</button>
                     </div>
-                    
                     <div id="view-req-new" class="space-y-4">
                         <div class="bg-white p-5 rounded-2xl shadow-sm space-y-3">
-                            <label class="flex items-center gap-3 bg-red-50 p-3 rounded-xl border border-red-100 cursor-pointer">
-                                <input type="checkbox" id="req-emergency" class="w-5 h-5 accent-red-600">
-                                <span class="text-red-600 font-bold text-sm">Emergency Request?</span>
-                            </label>
+                            <label class="flex items-center gap-3 bg-red-50 p-3 rounded-xl border border-red-100 cursor-pointer"><input type="checkbox" id="req-emergency" class="w-5 h-5 accent-red-600"><span class="text-red-600 font-bold text-sm">Emergency Request?</span></label>
                             <input type="text" id="req-patient" placeholder="Patient Name" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 outline-none">
                             <input type="text" id="req-hospital" placeholder="Hospital Name" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 outline-none">
                             <div class="flex gap-2">
@@ -175,543 +220,705 @@
                             </div>
                             <select id="req-thana" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 outline-none thana-select"><option value="">Select Thana</option></select>
                             <input type="tel" id="req-phone" placeholder="Contact Number" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 outline-none">
-                            <button onclick="submitRequest()" class="w-full bg-rose-600 text-white py-3 rounded-xl font-bold shadow-md">Post Request</button>
+                            <button onclick="submitRequest()" class="w-full bg-rose-600 text-white py-3 rounded-xl font-bold shadow-md active:scale-95 transition">Post Request</button>
                         </div>
                     </div>
                     <div id="view-req-all" class="hidden space-y-3"><div id="all-requests-list-view"></div></div>
                 </div>
 
-                <!-- NOTIFICATIONS PAGE -->
-                <div id="page-notifications" class="p-5 hidden fade-in">
-                    <h2 class="font-bold text-xl mb-4 text-gray-800">Notifications</h2>
-                    <button onclick="requestNotifPermission()" class="w-full bg-blue-50 text-blue-600 p-3 rounded-xl text-xs font-bold border border-blue-100 mb-4">Allow Device Notifications</button>
-                    <div id="notification-list" class="space-y-3"></div>
-                </div>
-
-                <!-- PROFILE PAGE -->
+                <!-- PROFILE -->
                 <div id="page-profile" class="p-5 hidden fade-in">
-                    <div class="bg-white p-6 rounded-[25px] shadow-sm text-center mb-4">
-                        <div class="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-3">
-                            <span id="profile-bg" class="text-2xl font-bold text-rose-600">--</span>
-                        </div>
-                        <h2 class="text-xl font-bold text-gray-800" id="profile-name">User Name</h2>
-                        <p class="text-sm text-gray-500" id="profile-location">Location</p>
-                        <div class="inline-flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full mt-2 border border-yellow-100">
-                            <span class="text-xs font-bold text-yellow-600">⭐ <span id="profile-coins">0</span> Coins</span>
-                        </div>
-                    </div>
-
-                    <!-- Achievements Section -->
-                    <div class="bg-white p-4 rounded-2xl shadow-sm mb-4">
-                        <h3 class="font-bold text-gray-700 text-sm mb-3">Achievements</h3>
-                        <div class="flex gap-2 overflow-x-auto pb-2" id="achievements-container">
-                            <!-- Badges will load here -->
-                            <div class="text-center text-xs text-gray-400 w-full">Loading...</div>
+                    <div class="bg-white p-6 rounded-[25px] shadow-sm text-center mb-4 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-24 bg-gradient-to-r from-rose-100 to-pink-100"></div>
+                        <div class="relative z-10">
+                            <div class="w-24 h-24 bg-white p-1 rounded-full mx-auto mb-3 shadow-md flex items-center justify-center border-4 border-rose-100">
+                                <span id="profile-bg" class="text-3xl font-black text-rose-600">--</span>
+                            </div>
+                            <h2 class="text-xl font-bold text-gray-800" id="profile-name">User Name</h2>
+                            <p class="text-sm text-gray-500" id="profile-location">Location</p>
                         </div>
                     </div>
-                    
+                    <div onclick="navTo('page-achievements')" class="bg-gradient-to-r from-indigo-500 to-purple-600 p-4 rounded-2xl shadow-lg mb-4 cursor-pointer flex justify-between items-center text-white active:scale-98 transition">
+                        <div><h3 class="font-bold text-lg">Achievements</h3><p class="text-xs text-indigo-100">View progress</p></div><div class="bg-white/20 p-2 rounded-full"><i class="fa-solid fa-trophy"></i></div>
+                    </div>
                     <div class="grid grid-cols-2 gap-4 mb-4">
-                        <div class="bg-white p-4 rounded-2xl shadow-sm text-center">
-                            <h3 class="text-2xl font-bold text-gray-800" id="profile-donations-count">0</h3>
-                            <p class="text-xs text-gray-400 uppercase font-bold">Donations</p>
-                        </div>
-                        <div class="bg-white p-4 rounded-2xl shadow-sm text-center">
-                            <h3 class="text-lg font-bold text-green-500" id="status-text">Active</h3>
-                            <p class="text-xs text-gray-400 uppercase font-bold">Status</p>
-                        </div>
+                        <div class="bg-white p-4 rounded-2xl shadow-sm text-center border border-gray-50"><h3 class="text-2xl font-bold text-gray-800" id="profile-donations-count">0</h3><p class="text-xs text-gray-400 uppercase font-bold tracking-wider">Donations</p></div>
+                        <div class="bg-white p-4 rounded-2xl shadow-sm text-center border border-gray-50"><h3 class="text-2xl font-bold text-green-500" id="profile-coins">0</h3><p class="text-xs text-gray-400 uppercase font-bold tracking-wider">Coins</p></div>
                     </div>
-
                     <div class="bg-white p-5 rounded-2xl shadow-sm space-y-4">
-                        <!-- Countdown Timer (Hidden by default) -->
-                        <div id="countdown-container" class="hidden bg-orange-50 p-3 rounded-xl border border-orange-100 text-center">
-                            <p class="text-xs text-orange-600 font-bold mb-1">Recovery Mode (90 Days)</p>
-                            <h3 class="text-xl font-bold text-orange-700" id="countdown-text">0 Days</h3>
-                            <p class="text-[10px] text-orange-500 mt-1">You can donate again after this period.</p>
+                         <div id="countdown-container" class="hidden bg-orange-50 p-4 rounded-xl border border-orange-100 text-center">
+                            <div class="w-10 h-10 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mx-auto mb-2"><i class="fa-solid fa-hourglass-half"></i></div>
+                            <p class="text-xs text-orange-600 font-bold mb-1">Recovery Mode</p>
+                            <h3 class="text-2xl font-bold text-orange-700 font-mono" id="countdown-text">0 Days</h3>
                         </div>
-
                         <div class="flex justify-between items-center">
-                            <span class="font-bold text-gray-700 text-sm">Available to Donate</span>
+                            <div><span class="font-bold text-gray-700 text-sm block">Active Donor Status</span><span class="text-xs text-gray-400" id="status-text-sub">Visible in search</span></div>
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="toggle-availability" onchange="toggleAvailability()" class="sr-only peer">
-                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-rose-600"></div>
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
                             </label>
                         </div>
                         <hr class="border-gray-100">
-                        <button onclick="handleLogout()" class="w-full text-left text-red-500 font-bold text-sm">Logout</button>
+                        <button onclick="handleLogout()" class="w-full text-left text-red-500 font-bold text-sm hover:bg-red-50 p-2 rounded transition">Logout</button>
                     </div>
                 </div>
 
-                <!-- CHAT LIST PAGE -->
+                <!-- ACHIEVEMENTS -->
+                <div id="page-achievements" class="p-5 hidden fade-in">
+                    <div class="flex items-center gap-3 mb-6">
+                        <button onclick="navTo('page-profile')" class="bg-white p-2 rounded-full shadow-sm text-gray-600 active:scale-95 transition"><i class="fa-solid fa-arrow-left"></i></button>
+                        <h2 class="font-bold text-xl text-gray-800">Your Achievements</h2>
+                    </div>
+                    <div id="achievements-list" class="space-y-4"><div class="loader-inline"></div></div>
+                </div>
+
+                <!-- CHATS -->
                 <div id="page-chats" class="p-5 hidden fade-in">
                     <h2 class="font-bold text-xl mb-4 text-gray-800">Messages</h2>
                     <div id="chat-list-container" class="space-y-3"></div>
                 </div>
-
-            </div>
-
-            <!-- Bottom Navigation (FIXED FOR MOBILE) -->
-            <div class="mobile-nav shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] flex justify-around py-3 px-2">
-                <button onclick="navTo('page-home')" class="nav-btn text-rose-600 flex flex-col items-center gap-1 w-1/5"><i class="fa-solid fa-house text-lg"></i></button>
-                <button onclick="navTo('page-search')" class="nav-btn text-gray-400 flex flex-col items-center gap-1 w-1/5"><i class="fa-solid fa-magnifying-glass text-lg"></i></button>
-                <div class="relative -top-8 w-1/5 flex justify-center">
-                    <button onclick="navTo('page-request')" class="bg-rose-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center border-4 border-white active:scale-95 transition"><i class="fa-solid fa-plus text-2xl"></i></button>
+                
+                <!-- NOTIFICATIONS -->
+                <div id="page-notifications" class="p-5 hidden fade-in">
+                    <h2 class="font-bold text-xl mb-4 text-gray-800">Notifications</h2>
+                    <div id="notification-list" class="space-y-3"></div>
                 </div>
-                <button onclick="navTo('page-feed')" class="nav-btn text-gray-400 flex flex-col items-center gap-1 w-1/5"><i class="fa-solid fa-rss text-lg"></i></button>
-                <button onclick="navTo('page-profile')" class="nav-btn text-gray-400 flex flex-col items-center gap-1 w-1/5"><i class="fa-solid fa-user text-lg"></i></button>
             </div>
 
+            <!-- Bottom Navigation -->
+            <div class="mobile-nav">
+                <button onclick="navTo('page-home')" class="nav-btn text-rose-600"><i class="fa-solid fa-house text-xl mb-0.5"></i></button>
+                <button onclick="navTo('page-search')" class="nav-btn text-gray-400"><i class="fa-solid fa-magnifying-glass text-xl mb-0.5"></i></button>
+                <div class="relative -top-8 pointer-events-none">
+                    <button onclick="navTo('page-request')" class="pointer-events-auto bg-gradient-to-br from-rose-600 to-rose-500 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center border-4 border-white active:scale-95 transition transform hover:-translate-y-1"><i class="fa-solid fa-plus text-2xl"></i></button>
+                </div>
+                <button onclick="navTo('page-chats')" class="nav-btn text-gray-400">
+                    <i class="fa-solid fa-comment-dots text-xl mb-0.5"></i>
+                    <div id="chat-badge" class="hidden nav-badge">0</div>
+                </button>
+                <button onclick="navTo('page-profile')" class="nav-btn text-gray-400"><i class="fa-solid fa-user text-xl mb-0.5"></i></button>
+            </div>
         </div>
 
-        <!-- 5. CHAT ROOM (Full Screen Overlay) -->
+        <!-- 5. CHAT ROOM -->
         <div id="page-chat-room" class="absolute inset-0 z-50 bg-white flex flex-col hidden slide-in">
-            <!-- Chat Header -->
             <div class="bg-white p-4 border-b border-gray-100 flex justify-between items-center shadow-sm">
                 <div class="flex items-center gap-3">
-                    <button onclick="backToChats()"><i class="fa-solid fa-arrow-left text-gray-600 text-xl"></i></button>
-                    <div>
-                        <h3 class="font-bold text-gray-800" id="chat-user-name">User</h3>
+                    <button onclick="backToChats()" class="active:scale-90 transition"><i class="fa-solid fa-arrow-left text-gray-600 text-xl"></i></button>
+                    <div class="cursor-pointer" onclick="viewChatUserProfile()">
+                        <h3 class="font-bold text-gray-800 flex items-center gap-2"><span id="chat-user-name">User</span> <i class="fa-solid fa-circle-info text-gray-300 text-xs"></i></h3>
                         <p class="text-xs text-green-500 font-bold">Online</p>
                     </div>
                 </div>
-                <!-- Only RECEIVER sees this button -->
-                <button id="btn-confirm-donation" onclick="confirmDonation()" class="hidden bg-yellow-400 text-yellow-900 px-4 py-1.5 rounded-full text-xs font-bold shadow animate-pulse">
-                    <i class="fa-solid fa-gift mr-1"></i> Received Blood?
-                </button>
+                <div class="flex gap-2">
+                    <button id="btn-confirm-donation" onclick="initiateDonationConfirm()" class="hidden bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-full text-xs font-bold shadow border border-emerald-200 active:scale-95 transition"><i class="fa-solid fa-check-circle mr-1"></i> Received</button>
+                    <button id="btn-verify-donation" onclick="finalizeDonation()" class="hidden bg-blue-100 text-blue-700 px-3 py-1.5 rounded-full text-xs font-bold shadow border border-blue-200 active:scale-95 transition animate-pulse"><i class="fa-solid fa-hand-holding-heart mr-1"></i> Verify</button>
+                </div>
             </div>
-            
-            <!-- Messages Area -->
-            <div id="messages-container" class="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
-                <!-- Dynamic Messages -->
-            </div>
-
-            <!-- Input Area -->
-            <div class="p-3 bg-white border-t border-gray-100 flex gap-2 items-center">
-                <input type="text" id="msg-input" placeholder="Type a message..." class="flex-1 bg-gray-100 rounded-full px-5 py-3 text-sm outline-none focus:ring-2 focus:ring-rose-200">
-                <button onclick="sendMessage()" class="bg-rose-600 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg active:scale-90 transition"><i class="fa-solid fa-paper-plane"></i></button>
+            <div id="messages-container" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50"></div>
+            <div class="p-3 bg-white border-t border-gray-100 flex gap-2 items-center safe-pb">
+                <input type="text" id="msg-input" placeholder="Type a message..." class="flex-1 bg-gray-100 rounded-full px-5 py-3 text-sm outline-none focus:ring-2 focus:ring-rose-200 transition">
+                <button onclick="sendMessage()" class="bg-rose-600 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg active:scale-90 transition hover:bg-rose-700"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
         </div>
 
         <!-- MODALS -->
-        <!-- Request Modal -->
-        <div id="request-modal" class="fixed inset-0 z-50 hidden flex items-end justify-center sm:items-center bg-black/50 backdrop-blur-sm transition-opacity" onclick="closeRequestModal()">
-            <div class="bg-white w-full sm:w-96 rounded-t-[30px] sm:rounded-3xl p-6 animate-[slideUp_0.3s_ease-out]" onclick="event.stopPropagation()">
+        <div id="request-modal" class="fixed inset-0 z-50 hidden flex items-end justify-center sm:items-center bg-black/60 backdrop-blur-sm transition-opacity" onclick="closeRequestModal()">
+            <div class="bg-white w-full sm:w-96 rounded-t-[30px] sm:rounded-3xl p-6 modal-up shadow-2xl" onclick="event.stopPropagation()">
+                <div class="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-4 sm:hidden"></div>
                 <h2 class="text-gray-500 text-sm font-bold uppercase mb-1">Blood Request</h2>
                 <h1 class="text-4xl font-black text-rose-600 mb-4" id="req-modal-blood">A+</h1>
-                <div class="bg-gray-50 p-4 rounded-2xl mb-4 space-y-2">
+                <div class="bg-gray-50 p-4 rounded-2xl mb-4 space-y-2 border border-gray-100">
                     <div class="flex justify-between"><span class="text-gray-400 text-xs font-bold">PATIENT</span><span class="font-bold text-gray-800" id="req-modal-patient">Name</span></div>
                     <div class="flex justify-between"><span class="text-gray-400 text-xs font-bold">LOCATION</span><span class="font-bold text-gray-800" id="req-modal-location">Loc</span></div>
                 </div>
                 <div class="flex gap-3">
-                    <a id="req-modal-call" href="#" class="flex-1 bg-emerald-500 text-white py-3 rounded-xl font-bold text-center shadow-lg">Call</a>
-                    <button onclick="startChatFromRequest()" class="flex-1 bg-rose-600 text-white py-3 rounded-xl font-bold shadow-lg">Message</button>
+                    <a id="req-call-btn" href="#" class="flex-1 bg-emerald-500 text-white py-3.5 rounded-xl font-bold text-center shadow-lg hover:bg-emerald-600 active:scale-95 transition">Call Now</a>
+                    <button id="req-msg-btn" onclick="startChatFromRequest()" class="flex-1 bg-rose-600 text-white py-3.5 rounded-xl font-bold shadow-lg hover:bg-rose-700 active:scale-95 transition">Message</button>
                 </div>
             </div>
         </div>
-
-        <!-- Donor Modal -->
-        <div id="donor-modal" class="fixed inset-0 z-50 hidden flex items-end justify-center sm:items-center bg-black/50 backdrop-blur-sm transition-opacity" onclick="closeDonorModal()">
-            <div class="bg-white w-full sm:w-96 rounded-t-[30px] sm:rounded-3xl p-6 animate-[slideUp_0.3s_ease-out]" onclick="event.stopPropagation()">
+        
+        <div id="donor-modal" class="fixed inset-0 z-50 hidden flex items-end justify-center sm:items-center bg-black/60 backdrop-blur-sm transition-opacity" onclick="closeDonorModal()">
+            <div class="bg-white w-full sm:w-96 rounded-t-[30px] sm:rounded-3xl p-6 modal-up shadow-2xl" onclick="event.stopPropagation()">
+                <div class="w-12 h-1 bg-gray-300 rounded-full mx-auto mb-4 sm:hidden"></div>
                 <h2 class="text-gray-500 text-sm font-bold uppercase mb-1">Donor Details</h2>
                 <h1 class="text-4xl font-black text-rose-600 mb-4" id="modal-blood">A+</h1>
-                <div class="bg-gray-50 p-4 rounded-2xl mb-4 space-y-2">
+                <div class="bg-gray-50 p-4 rounded-2xl mb-4 space-y-2 border border-gray-100">
                     <div class="flex justify-between"><span class="text-gray-400 text-xs font-bold">NAME</span><span class="font-bold text-gray-800" id="modal-name">Name</span></div>
                     <div class="flex justify-between"><span class="text-gray-400 text-xs font-bold">LOCATION</span><span class="font-bold text-gray-800" id="modal-location">Loc</span></div>
                 </div>
                 <div class="flex gap-3">
-                    <a id="modal-call-btn" href="#" class="flex-1 bg-emerald-500 text-white py-3 rounded-xl font-bold text-center shadow-lg">Call</a>
-                    <button onclick="startChatFromModal()" class="flex-1 bg-rose-600 text-white py-3 rounded-xl font-bold shadow-lg">Message</button>
+                    <a id="modal-call-btn" href="#" class="flex-1 bg-emerald-500 text-white py-3.5 rounded-xl font-bold text-center shadow-lg hover:bg-emerald-600 active:scale-95 transition">Call Now</a>
+                    <button onclick="startChatFromModal()" class="flex-1 bg-rose-600 text-white py-3.5 rounded-xl font-bold shadow-lg hover:bg-rose-700 active:scale-95 transition">Message</button>
                 </div>
             </div>
         </div>
 
-        <!-- TOAST -->
-        <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-full shadow-xl text-sm opacity-0 transition pointer-events-none z-[100] font-medium"></div>
+        <!-- PROFILE VIEW MODAL (With Achievements) -->
+        <div id="view-profile-modal" class="fixed inset-0 z-[60] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onclick="closeViewProfile()">
+            <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl relative" onclick="event.stopPropagation()">
+                <button onclick="closeViewProfile()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-rose-100 rounded-full mx-auto mb-3 flex items-center justify-center"><span id="vp-blood" class="text-2xl font-black text-rose-600">--</span></div>
+                    <h2 class="text-xl font-bold text-gray-800" id="vp-name">Name</h2>
+                    <p class="text-sm text-gray-500" id="vp-loc">Location</p>
+                    <div class="flex justify-center gap-4 mt-4">
+                        <div class="text-center"><h3 class="font-bold text-lg" id="vp-donations">0</h3><p class="text-[10px] uppercase text-gray-400">Donations</p></div>
+                        <div class="text-center"><h3 class="font-bold text-lg text-green-600" id="vp-coins">0</h3><p class="text-[10px] uppercase text-gray-400">Coins</p></div>
+                    </div>
+                    <div class="mt-5 pt-4 border-t border-gray-100">
+                        <p class="text-xs font-bold text-gray-400 uppercase mb-2">Achievements</p>
+                        <div id="vp-achievements" class="flex flex-wrap justify-center gap-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <!-- CONFIRMATION MODAL (Manual Trigger Only) -->
+        <div id="donation-confirm-modal" class="fixed inset-0 z-[70] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm p-6">
+             <!-- Logic handled in JS -->
+        </div>
+
+        <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl text-sm opacity-0 transition pointer-events-none z-[100] font-medium tracking-wide"></div>
     </div>
 
     <!-- SCRIPT -->
     <script>
-        // CONFIG
-        const firebaseConfig = { apiKey: "AIzaSyD-KhR0RZaZmmyC1FhwBC-_Fmx2c3JQv4Q", authDomain: "life-share-bec9f.firebaseapp.com", projectId: "life-share-bec9f", storageBucket: "life-share-bec9f.firebasestorage.app", messagingSenderId: "827132708192", appId: "1:827132708192:web:01694761884f2261540a05", measurementId: "G-TTH88RY97Q" };
+        // -----------------------------------------------------------------------
+        // YOUR FIREBASE CONFIG
+        // -----------------------------------------------------------------------
+        const firebaseConfig = {
+            apiKey: "AIzaSyD-KhR0RZaZmmyC1FhwBC-_Fmx2c3JQv4Q",
+            authDomain: "life-share-bec9f.firebaseapp.com",
+            projectId: "life-share-bec9f",
+            storageBucket: "life-share-bec9f.firebasestorage.app",
+            messagingSenderId: "827132708192",
+            appId: "1:827132708192:web:01694761884f2261540a05",
+            measurementId: "G-TTH88RY97Q"
+        };
+        // -----------------------------------------------------------------------
+
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // MASSIVE THANA LIST
-        const allThanas = [
-            "Abhaynagar", "Adamdighi", "Aditmari", "Agailjhara", "Ajmiriganj", "Akhaura", "Akkelpur", "Alamdanga", "Alfadanga", "Ali Kadam", "Amtali", "Anwara", "Araihazar", "Ashuganj", "Assasuni", "Atgharia", "Atpara", "Atrai", "Atwari",
-            "Babuganj", "Badalgachhi", "Badarganj", "Bagaichhari", "Bagha", "Bagherpara", "Bagmara", "Bahubal", "Bajitpur", "Bakerganj", "Baksiganj", "Balaganj", "Baliadangi", "Bancharampur", "Bandar", "Bandarban Sadar", "Baniyachong", "Banshkhali", "Baraigram", "Barhatta", "Barisal Sadar", "Barkal", "Barlekha", "Barura", "Basail", "Batiaghata", "Bauphal", "Beanibazar", "Begumganj", "Belabo", "Belaichhari", "Belkuchi", "Bera", "Betagi", "Bhairab", "Bhaluka", "Bhandaria", "Bhanga", "Bhangura", "Bhedarganj", "Bheramara", "Bhola Sadar", "Bholahat", "Bhuapur", "Bhurungamari", "Bijoynagar", "Biral", "Birampur", "Birganj", "Bishwamvarpur", "Bishwanath", "Boalkhali", "Boalmari", "Bochaganj", "Boda", "Bogra Sadar", "Brahmanbaria Sadar", "Brahmanpara", "Burichang", "Burhanuddin",
-            "Chakaria", "Chandanaish", "Chandina", "Chandpur Sadar", "Char Bhadrasan", "Char Fasson", "Char Rajibpur", "Charghat", "Chatkhil", "Chatmohar", "Chauddagram", "Chhagalnaiya", "Chhatak", "Chilmari", "Chitalmari", "Chougachha", "Chuhadanga Sadar", "Chunarughat", "Comilla Sadar", "Comilla Sadar South", "Companiganj", "Cox's Bazar Sadar",
-            "Dacope", "Daganbhuiyan", "Damudya", "Damurhuda", "Dashmina", "Daudkandi", "Daulatpur", "Daulatkhan", "Debidwar", "Debiganj", "Delduar", "Derai", "Dewanganj", "Dhamoirhat", "Dhamrai", "Dhanbari", "Dhanmondi", "Dharamapasha", "Dhobaura", "Dhunat", "Dupchanchia", "Dighalia", "Dighinala", "Dimla", "Dinajpur Sadar", "Dohar", "Domar", "Dumki", "Dumuria", "Durgapur",
-            "Eidgaon", "Etna", "Fakirhat", "Faridganj", "Faridpur Sadar", "Fatikchhari", "Fenchuganj", "Feni Sadar", "Fulbaria", "Fulgazi", "Fulchhari", "Phulpur", "Phultala",
-            "Gabtali", "Gafargaon", "Gaibandha Sadar", "Galachipa", "Gangachara", "Gangni", "Gazaria", "Gazipur Sadar", "Ghatail", "Ghior", "Ghoraghat", "Goalandaghat", "Gobindaganj", "Godagari", "Golapganj", "Gomastapur", "Gopalganj Sadar", "Gopalpur", "Gosairhat", "Gournadi", "Gowainghat", "Guimara", "Gulshan", "Gurdaspur",
-            "Habiganj Sadar", "Haimchar", "Hakimpur", "Haluaghat", "Harinakunda", "Harintana", "Haripur", "Harirampur", "Hathazari", "Hatibandha", "Hatiya", "Haziganj", "Hizla", "Hosenpur",
-            "Ishwarganj", "Ishwardi", "Islampur", "Itna", "Jagannathpur", "Jaintiapur", "Jaldhaka", "Jamalganj", "Jamalpur Sadar", "Jashore Sadar", "Jhalokati Sadar", "Jhenaidah Sadar", "Jhikargachha", "Jibannagar", "Juraichhari", "Juropukuria",
-            "Kabirhat", "Kachua", "Kahaloo", "Kaharole", "Kalai", "Kalapara", "Kalaroa", "Kalia", "Kaliakair", "Kaliganj", "Kalkini", "Kalmakanda", "Kamarkhanda", "Kamalnagar", "Kamalganj", "Kanaighat", "Kapasia", "Kaptai", "Karimganj", "Karnaphuli", "Kasba", "Kashiani", "Kathalia", "Katiadi", "Kaunia", "Kawkhali", "Kazipur", "Kendua", "Keraniganj", "Keshabpur", "Khagrachhari Sadar", "Khaliajuri", "Khalishpur", "Khan Jahan Ali", "Khansama", "Khetlal", "Khulna Sadar", "Kishoreganj Sadar", "Kitalmari", "Kotchandpur", "Kotwali", "Koyra", "Kulaura", "Kuliarchar", "Kurigram Sadar", "Kushtia Sadar",
-            "Lakhai", "Laksam", "Lakshmipur Sadar", "Lalbagh", "Lalmohan", "Lalmonirhat Sadar", "Lama", "Langadu", "Lohagara", "Lohajang",
-            "Madaripur Sadar", "Madarganj", "Madhabpur", "Madhukhali", "Madhupur", "Magura Sadar", "Mahalchhari", "Maheshkhali", "Maheshpur", "Manda", "Manikchhari", "Manikganj Sadar", "Manirampur", "Manpura", "Mathbaria", "Matihar", "Matiranga", "Matlab North", "Matlab South", "Meghna", "Mehendiganj", "Meherpur Sadar", "Melandaha", "Mirsarai", "Mirpur", "Mirzapur", "Mithamain", "Mithapukur", "Mohammadpur", "Mohanpur", "Mohanganj", "Moheshkhali", "Mongla", "Monohardi", "Monoharganj", "Morrelganj", "Moulvibazar Sadar", "Mujibnagar", "Muktagachha", "Muladi", "Munshiganj Sadar", "Muradnagar", "Mymensingh Sadar",
-            "Nabinagar", "Nachole", "Nagarkanda", "Nagarpur", "Nageshwari", "Naikhongchhari", "Nakla", "Nalchity", "Naldanga", "Nalitabari", "Nandail", "Nandigram", "Nangalkot", "Naniyachar", "Naogaon Sadar", "Narail Sadar", "Narayanganj Sadar", "Naria", "Narsingdi Sadar", "Nasirnagar", "Natore Sadar", "Nawabganj", "Nazirpur", "Nesarabad", "Netrokona Sadar", "Niamatpur", "Nikli", "Nilphamari Sadar", "Noakhali Sadar",
-            "Osmani Nagar", "Paba", "Pabna Sadar", "Paikgachha", "Pakundia", "Palash", "Palashbari", "Panchagarh Sadar", "Panchbibi", "Panchlaish", "Pangsha", "Parbatipur", "Parshuram", "Patgram", "Patharghata", "Patiya", "Patnitala", "Patuakhali Sadar", "Pekua", "Phulbari", "Phulchhari", "Phulpur", "Pirgachha", "Pirganj", "Pirojpur Sadar", "Porsha", "Premtali", "Purbadhala", "Puthiya",
-            "Raiganj", "Raipur", "Raipura", "Rajapur", "Rajarhat", "Rajasthali", "Rajbari Sadar", "Rajibpur", "Rajoir", "Rajpara", "Rajshahi Sadar", "Ramganj", "Ramgarh", "Ramgati", "Rampal", "Ramu", "Rangabali", "Rangamati Sadar", "Rangpur Sadar", "Rangunia", "Raozan", "Rowmari", "Ruma", "Rupganj", "Rupsha",
-            "Sadarpur", "Sadullapur", "Saidpur", "Sakhipur", "Saltha", "Sandwip", "Santhia", "Sapahar", "Sadar South", "Sarail", "Sariakandi", "Sarishabari", "Satkhira Sadar", "Satkania", "Savar", "Senbagh", "Shahbag", "Shahbazpur", "Shahjadpur", "Shahjalal", "Shailkupa", "Shajahanpur", "Shakhipur", "Shalikha", "Sherpur Sadar", "Sherpur", "Shibchar", "Shibganj", "Shibpur", "Shyamnagar", "Singair", "Singra", "Sirajdikhan", "Sirajganj Sadar", "Sitakunda", "Sonadanga", "Sonagazi", "Sonaimuri", "Sonargaon", "Sonatala", "South Surma", "Sreebardi", "Sreemangal", "Sreenagar", "Sreepur", "Subarnachar", "Sujanagar", "Sulla", "Sunamganj Sadar", "Sundarganj", "Sylhet Sadar",
-            "Tahirpur", "Tala", "Taltali", "Tangail Sadar", "Tanore", "Tara", "Taraganj", "Tarail", "Tarash", "Tazumuddin", "Tejgaon", "Teknaf", "Terokhada", "Tetulia", "Thakurgaon Sadar", "Thanchi", "Titas", "Tongibari", "Trishal", "Tungipara", "Ukhia", "Ulipur", "Ullapara", "Uttara", "Wazirpur", "Zakiganj", "Zanjira"
-        ];
+        const allThanas = ["Abhaynagar","Adamdighi","Aditmari","Agailjhara","Ajmiriganj","Akhaura","Akkelpur","Alamdanga","Alfadanga","Ali Kadam","Amtali","Anwara","Araihazar","Ashuganj","Assasuni","Atgharia","Atpara","Atrai","Atwari","Babuganj","Badalgachhi","Badarganj","Bagaichhari","Bagha","Bagherpara","Bagmara","Bahubal","Bajitpur","Bakerganj","Baksiganj","Balaganj","Baliadangi","Bancharampur","Bandar","Bandarban Sadar","Baniyachong","Banshkhali","Baraigram","Barhatta","Barisal Sadar","Barkal","Barlekha","Barura","Basail","Batiaghata","Bauphal","Beanibazar","Begumganj","Belabo","Belaichhari","Belkuchi","Bera","Betagi","Bhairab","Bhaluka","Bhandaria","Bhanga","Bhangura","Bhedarganj","Bheramara","Bhola Sadar","Bholahat","Bhuapur","Bhurungamari","Bijoynagar","Biral","Birampur","Birganj","Bishwamvarpur","Bishwanath","Boalkhali","Boalmari","Bochaganj","Boda","Bogra Sadar","Brahmanbaria Sadar","Brahmanpara","Burichang","Burhanuddin","Chakaria","Chandanaish","Chandina","Chandpur Sadar","Char Bhadrasan","Char Fasson","Char Rajibpur","Charghat","Chatkhil","Chatmohar","Chauddagram","Chhagalnaiya","Chhatak","Chilmari","Chitalmari","Chougachha","Chuhadanga Sadar","Chunarughat","Comilla Sadar","Comilla Sadar South","Companiganj","Cox's Bazar Sadar","Dacope","Daganbhuiyan","Damudya","Damurhuda","Dashmina","Daudkandi","Daulatpur","Daulatkhan","Debidwar","Debiganj","Delduar","Derai","Dewanganj","Dhamoirhat","Dhamrai","Dhanbari","Dhanmondi","Dharamapasha","Dhobaura","Dhunat","Dupchanchia","Dighalia","Dighinala","Dimla","Dinajpur Sadar","Dohar","Domar","Dumki","Dumuria","Durgapur","Eidgaon","Etna","Fakirhat","Faridganj","Faridpur Sadar","Fatikchhari","Fenchuganj","Feni Sadar","Fulbaria","Fulgazi","Fulchhari","Phulpur","Phultala","Gabtali","Gafargaon","Gaibandha Sadar","Galachipa","Gangachara","Gangni","Gazaria","Gazipur Sadar","Ghatail","Ghior","Ghoraghat","Goalandaghat","Gobindaganj","Godagari","Golapganj","Gomastapur","Gopalganj Sadar","Gopalpur","Gosairhat","Gournadi","Gowainghat","Guimara","Gulshan","Gurdaspur","Habiganj Sadar","Haimchar","Hakimpur","Haluaghat","Harinakunda","Harintana","Haripur","Harirampur","Hathazari","Hatibandha","Hatiya","Haziganj","Hizla","Hosenpur","Ishwarganj","Ishwardi","Islampur","Itna","Jagannathpur","Jaintiapur","Jaldhaka","Jamalganj","Jamalpur Sadar","Jashore Sadar","Jhalokati Sadar","Jhenaidah Sadar","Jhikargachha","Jibannagar","Juraichhari","Juropukuria","Kabirhat","Kachua","Kahaloo","Kaharole","Kalai","Kalapara","Kalaroa","Kalia","Kaliakair","Kaliganj","Kalkini","Kalmakanda","Kamarkhanda","Kamalnagar","Kamalganj","Kanaighat","Kapasia","Kaptai","Karimganj","Karnaphuli","Kasba","Kashiani","Kathalia","Katiadi","Kaunia","Kawkhali","Kazipur","Kendua","Keraniganj","Keshabpur","Khagrachhari Sadar","Khaliajuri","Khalishpur","Khan Jahan Ali","Khansama","Khetlal","Khulna Sadar","Kishoreganj Sadar","Kitalmari","Kotchandpur","Kotwali","Koyra","Kulaura","Kuliarchar","Kurigram Sadar","Kushtia Sadar","Lakhai","Laksam","Lakshmipur Sadar","Lalbagh","Lalmohan","Lalmonirhat Sadar","Lama","Langadu","Lohagara","Lohajang","Madaripur Sadar","Madarganj","Madhabpur","Madhukhali","Madhupur","Magura Sadar","Mahalchhari","Maheshkhali","Maheshpur","Manda","Manikchhari","Manikganj Sadar","Manirampur","Manpura","Mathbaria","Matihar","Matiranga","Matlab North","Matlab South","Meghna","Mehendiganj","Meherpur Sadar","Melandaha","Mirsarai","Mirpur","Mirzapur","Mithamain","Mithapukur","Mohammadpur","Mohanpur","Mohanganj","Moheshkhali","Mongla","Monohardi","Monoharganj","Morrelganj","Moulvibazar Sadar","Mujibnagar","Muktagachha","Muladi","Munshiganj Sadar","Muradnagar","Mymensingh Sadar","Nabinagar","Nachole","Nagarkanda","Nagarpur","Nageshwari","Naikhongchhari","Nakla","Nalchity","Naldanga","Nalitabari","Nandail","Nandigram","Nangalkot","Naniyachar","Naogaon Sadar","Narail Sadar","Narayanganj Sadar","Naria","Narsingdi Sadar","Nasirnagar","Natore Sadar","Nawabganj","Nazirpur","Nesarabad","Netrokona Sadar","Niamatpur","Nikli","Nilphamari Sadar","Noakhali Sadar","Osmani Nagar","Paba","Pabna Sadar","Paikgachha","Pakundia","Palash","Palashbari","Panchagarh Sadar","Panchbibi","Panchlaish","Pangsha","Parbatipur","Parshuram","Patgram","Patharghata","Patiya","Patnitala","Patuakhali Sadar","Pekua","Phulbari","Phulchhari","Phulpur","Pirgachha","Pirganj","Pirojpur Sadar","Porsha","Premtali","Purbadhala","Puthiya","Raiganj","Raipur","Raipura","Rajapur","Rajarhat","Rajasthali","Rajbari Sadar","Rajibpur","Rajoir","Rajpara","Rajshahi Sadar","Ramganj","Ramgarh","Ramgati","Rampal","Ramu","Rangabali","Rangamati Sadar","Rangpur Sadar","Rangunia","Raozan","Rowmari","Ruma","Rupganj","Rupsha","Sadarpur","Sadullapur","Saidpur","Sakhipur","Saltha","Sandwip","Santhia","Sapahar","Sadar South","Sarail","Sariakandi","Sarishabari","Satkhira Sadar","Satkania","Savar","Senbagh","Shahbag","Shahbazpur","Shahjadpur","Shahjalal","Shailkupa","Shajahanpur","Shakhipur","Shalikha","Sherpur Sadar","Sherpur","Shibchar","Shibganj","Shibpur","Shyamnagar","Singair","Singra","Sirajdikhan","Sirajganj Sadar","Sitakunda","Sonadanga","Sonagazi","Sonaimuri","Sonargaon","Sonatala","South Surma","Sreebardi","Sreemangal","Sreenagar","Sreepur","Subarnachar","Sujanagar","Sulla","Sunamganj Sadar","Sundarganj","Sylhet Sadar","Tahirpur","Tala","Taltali","Tangail Sadar","Tanore","Tara","Taraganj","Tarail","Tarash","Tazumuddin","Tejgaon","Teknaf","Terokhada","Tetulia","Thakurgaon Sadar","Thanchi","Titas","Tongibari","Trishal","Tungipara","Ukhia","Ulipur","Ullapara","Uttara","Wazirpur","Zakiganj","Zanjira"];
 
         function populateThanas() {
-            allThanas.sort();
             const selects = document.querySelectorAll('.thana-select');
             selects.forEach(s => {
                 s.innerHTML = '<option value="">Select Thana</option>';
-                allThanas.forEach(t => s.insertAdjacentHTML('beforeend', `<option value="${t}">${t}</option>`));
+                allThanas.sort().forEach(t => s.insertAdjacentHTML('beforeend', `<option value="${t}">${t}</option>`));
             });
         }
         populateThanas();
 
         let currentUserData = null;
-        let activeChatId = null, activeChatUser = null;
+        let activeChatId = null, activeChatUser = null, activeChatRequestId = null;
 
-        // AUTH STATE
+        // AUTH STATE WITH REAL-TIME LISTENER
         auth.onAuthStateChanged(async (u) => {
             document.getElementById('splash').style.display='none';
             if (u) {
                 document.getElementById('auth-page').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
-                try {
-                    const snap = await db.collection("users").doc(u.uid).get();
-                    if(snap.exists){
-                        currentUserData = snap.data();
-                        showApp();
+                
+                // REAL-TIME USER LISTENER
+                db.collection("users").doc(u.uid).onSnapshot(doc => {
+                    if(doc.exists){
+                        currentUserData = doc.data();
+                        if(currentUserData.role === 'admin') {
+                            document.getElementById('main-app').classList.add('hidden');
+                            document.getElementById('admin-panel').classList.remove('hidden');
+                            loadAdminDashboard();
+                        } else {
+                            showApp(); 
+                        }
                     } else {
                         currentUserData = {name:u.email, uid:u.uid, role:'user', coins:0, badge:'Rookie'};
                         showApp();
                     }
-                } catch(e) { console.error(e); }
-                requestNotifPermission(); // Ask for permission on load
+                });
+                
+                requestNotifPermission();
+                startGlobalChatListener();
             } else {
                 document.getElementById('auth-page').classList.remove('hidden');
                 document.getElementById('main-app').classList.add('hidden');
+                document.getElementById('admin-panel').classList.add('hidden');
             }
         });
 
-        // FIXED NAVIGATION LOGIC
         window.navTo = (id) => {
-            const pages = ['page-home','page-search','page-request','page-feed','page-profile','page-notifications','page-chats'];
-            pages.forEach(p => {
-                const el = document.getElementById(p);
-                if(el) el.classList.add('hidden');
-            });
+            const pages = ['page-home','page-search','page-request','page-completed','page-profile','page-notifications','page-chats','page-achievements'];
+            pages.forEach(p => { const el = document.getElementById(p); if(el) el.classList.add('hidden'); });
             const target = document.getElementById(id);
             if(target) target.classList.remove('hidden');
             
-            // Special Loads
-            if(id==='page-home' || id==='page-feed') loadGlobalRequests();
+            if(id==='page-home') loadGlobalRequests();
+            if(id==='page-completed') loadCompletedRequests();
             if(id==='page-chats') loadChatList();
             if(id==='page-profile') loadProfile();
+            if(id==='page-achievements') loadAchievements();
             
-            // Fix Bottom Nav Highlights
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.replace('text-rose-600','text-gray-400'));
-            const map = {'page-home':0, 'page-search':1, 'page-feed':2, 'page-profile':3};
+            const map = {'page-home':0, 'page-search':1, 'page-chats':3, 'page-profile':4};
             const btns = document.querySelectorAll('.nav-btn');
-            if(map[id]!==undefined && btns[map[id]]) {
-                btns[map[id]].classList.replace('text-gray-400','text-rose-600');
-            }
+            if(map[id]!==undefined && btns[map[id]]) btns[map[id]].classList.replace('text-gray-400','text-rose-600');
         };
 
-        // APP LOGIC
         function showApp() {
-            if(currentUserData.name) document.getElementById('user-name-display').innerText = currentUserData.name.split(' ')[0];
-            document.getElementById('home-coins').innerText = currentUserData.coins || 0;
-            loadProfile(); loadGlobalRequests(); navTo('page-home');
+            if(currentUserData && currentUserData.name) {
+                document.getElementById('user-name-display').innerText = currentUserData.name.split(' ')[0];
+                document.getElementById('home-coins').innerText = currentUserData.coins || 0;
+                loadProfile(); 
+            }
+            loadGlobalRequests(); 
+            if(!document.getElementById('page-home').classList.contains('hidden')) return;
         }
 
-        // PROFILE LOGIC (ACTIVE STATUS & ACHIEVEMENTS)
-        function loadProfile() {
-            document.getElementById('profile-name').innerText = currentUserData.name;
-            document.getElementById('profile-location').innerText = currentUserData.thana;
-            document.getElementById('profile-bg').innerText = currentUserData.blood;
-            document.getElementById('profile-donations-count').innerText = currentUserData.donationCount || 0;
-            const coins = currentUserData.coins || 0;
-            document.getElementById('profile-coins').innerText = coins;
-
-            // 1. Achievements Logic
-            const badgesDiv = document.getElementById('achievements-container');
-            let badgesHtml = '';
-            
-            // Badge 1: Rookie
-            if(coins >= 0) badgesHtml += `<div class="bg-gray-100 px-3 py-1 rounded-full border text-xs font-bold text-gray-500 whitespace-nowrap">🌱 Rookie</div>`;
-            // Badge 2: Hero
-            if(coins >= 100) badgesHtml += `<div class="bg-blue-50 px-3 py-1 rounded-full border border-blue-100 text-xs font-bold text-blue-600 whitespace-nowrap">🦸 Hero</div>`;
-            // Badge 3: Legend
-            if(coins >= 500) badgesHtml += `<div class="bg-yellow-50 px-3 py-1 rounded-full border border-yellow-100 text-xs font-bold text-yellow-600 whitespace-nowrap">👑 Legend</div>`;
-            
-            badgesDiv.innerHTML = badgesHtml;
-
-            // 2. Active Status & 90 Day Logic
-            const toggle = document.getElementById('toggle-availability');
-            const countdownContainer = document.getElementById('countdown-container');
-            const countdownText = document.getElementById('countdown-text');
-            const statusText = document.getElementById('status-text');
-
-            if (currentUserData.lastDonationDate) {
-                const lastDate = currentUserData.lastDonationDate.toDate();
-                const now = new Date();
-                const diffTime = Math.abs(now - lastDate);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                const remainingDays = 90 - diffDays;
-
-                if (remainingDays > 0) {
-                    // Still inside 90 days
-                    toggle.checked = false;
-                    toggle.disabled = true;
-                    currentUserData.available = false; // Force Update local state
-                    
-                    statusText.innerText = "Recovering";
-                    statusText.className = "text-lg font-bold text-orange-500";
-                    
-                    countdownContainer.classList.remove('hidden');
-                    countdownText.innerText = remainingDays + " Days left";
-                } else {
-                    // 90 days passed
-                    toggle.disabled = false;
-                    toggle.checked = currentUserData.available;
-                    countdownContainer.classList.add('hidden');
-                    
-                    if(currentUserData.available) {
-                        statusText.innerText = "Active";
-                        statusText.className = "text-lg font-bold text-green-500";
-                    } else {
-                        statusText.innerText = "Unavailable";
-                        statusText.className = "text-lg font-bold text-gray-400";
-                    }
-                }
-            } else {
-                // Never donated
-                toggle.disabled = false;
-                toggle.checked = currentUserData.available;
-                countdownContainer.classList.add('hidden');
+        function startGlobalChatListener() {
+            db.collection("chats").where("participants","array-contains",auth.currentUser.uid).onSnapshot(s => {
+                let unreadCount = 0;
+                s.forEach(doc => {
+                    const d = doc.data();
+                    if(d.lastSenderId !== auth.currentUser.uid && d.isSeen === false) { unreadCount++; }
+                });
+                const badge = document.getElementById('chat-badge');
+                if(unreadCount > 0) { badge.innerText = unreadCount; badge.classList.remove('hidden'); } 
+                else { badge.classList.add('hidden'); }
                 
-                if(currentUserData.available) {
-                    statusText.innerText = "Active";
-                    statusText.className = "text-lg font-bold text-green-500";
-                } else {
-                    statusText.innerText = "Unavailable";
-                    statusText.className = "text-lg font-bold text-gray-400";
-                }
-            }
+                s.docChanges().forEach(change => {
+                    if (change.type === "modified" || change.type === "added") {
+                        const d = change.doc.data();
+                        if(d.lastSenderId !== auth.currentUser.uid && d.isSeen === false) showNotification("New Message", d.lastMessage);
+                    }
+                });
+            });
         }
 
-        async function toggleAvailability() {
-            const newVal = document.getElementById('toggle-availability').checked;
+        function checkDonationEligibility() {
+            if (!currentUserData || !currentUserData.lastDonationDate) return { allowed: true };
+            
+            const lastDate = currentUserData.lastDonationDate.toDate();
+            const diffTime = Math.abs(new Date() - lastDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            const remainingDays = 90 - diffDays;
+            
+            if (remainingDays > 0) {
+                return { allowed: false, days: remainingDays };
+            }
+            return { allowed: true };
+        }
+
+        // SEARCH DONOR
+        async function searchDonors() {
+            const thana = document.getElementById('search-thana').value;
+            const blood = document.getElementById('search-blood').value;
+            const list = document.getElementById('donors-list');
+            
+            list.innerHTML = "<div class='loader-inline'></div>";
+
             try {
-                await db.collection("users").doc(auth.currentUser.uid).update({available: newVal});
-                currentUserData.available = newVal;
-                loadProfile(); // Refresh UI
-                showToast(newVal ? "You are now Active" : "You are Unavailable");
-            } catch(e) {
-                showToast("Error updating status");
+                const s = await db.collection("users").where("role", "==", "donor").get();
+                let res = [];
+                s.forEach(doc => {
+                    const u = doc.data();
+                    if (u.available && (blood === "All" || u.blood === blood) && (thana === "" || u.thana === thana)) {
+                        res.push({id: doc.id, ...u});
+                    }
+                });
+                window.currentSearchResults = res;
+
+                if (res.length === 0) {
+                    list.innerHTML = "<p class='text-center text-gray-400 mt-5'>No available donors found.</p>";
+                    return;
+                }
+
+                let h = "";
+                res.forEach((u, i) => {
+                    h += `<div onclick="window.openDonorModal(${i})" class="bg-white p-4 rounded-2xl shadow-sm mb-2 cursor-pointer flex justify-between border border-gray-100 active:scale-95 transition"><div><b>${u.name}</b><br><span class="text-xs text-rose-500 font-bold">${u.blood}</span> <span class="text-xs text-gray-400">| ${u.thana}</span></div><div class="text-xs bg-yellow-50 text-yellow-600 px-2 py-1 rounded h-fit font-bold">⭐ ${u.coins||0}</div></div>`;
+                });
+                list.innerHTML = h;
+            } catch (e) {
+                console.error(e);
+                list.innerHTML = "<p class='text-center text-red-500'>Error searching donors.</p>";
             }
         }
 
-        // REQUESTS & FEED
+        // REQUEST
         async function submitRequest() {
             const p=document.getElementById('req-patient').value, t=document.getElementById('req-thana').value;
-            const isEmer = document.getElementById('req-emergency').checked;
             if(!p||!t) return showToast("Fill required fields");
             
-            toggleLoader('post',true);
+            const btn = document.querySelector('button[onclick="submitRequest()"]');
+            btn.innerHTML = "<div class='loader-inline'></div>";
+            
             try {
                 await db.collection("requests").add({
                     patient:p, hospital:document.getElementById('req-hospital').value, blood:document.getElementById('req-blood').value,
                     date:document.getElementById('req-date').value, thana:t, phone:document.getElementById('req-phone').value,
-                    isEmergency:isEmer, createdBy:auth.currentUser.uid, createdAt:new Date(), status:'active'
+                    isEmergency:document.getElementById('req-emergency').checked, createdBy:auth.currentUser.uid, createdAt:new Date(), status:'active'
                 });
                 showToast("Posted!"); switchReqTab('all');
             } catch(e){ showToast("Error"); }
-            toggleLoader('post',false);
+            btn.innerText = "Post Request";
         }
 
-        function generateReqCard(r,i,f) {
+        function generateReqCard(r,i,f, isOwner=false) {
              const date = r.createdAt ? new Date(r.createdAt.seconds*1000).toLocaleDateString() : 'New';
              const fn = f ? `window.openRequestModal(${i},true)` : `window.openRequestModal(${i},false)`;
-             const badge = r.isEmergency ? `<div class="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded mb-1 w-fit flex gap-1"><i class="fa-solid fa-triangle-exclamation"></i> EMERGENCY</div>` : `<div class="h-5"></div>`;
-             return `<div onclick="${fn}" class="blood-card p-4 mb-4 relative cursor-pointer bg-[#FFF1F2]"><div class="flex justify-between items-start"><div>${badge}<h2 class="text-slate-800 font-bold text-lg">Need <span class="text-rose-600 font-black text-2xl">${r.blood}</span></h2><p class="text-slate-600 font-medium text-sm mt-1">${r.patient}</p><div class="flex items-center gap-1 text-slate-500 text-xs mt-3 font-medium"><i class="fa-solid fa-location-dot text-rose-500"></i> ${r.thana}</div></div><div class="flex flex-col items-end justify-between h-full gap-6"><span class="text-[10px] text-rose-800 font-bold">${date}</span><a href="tel:${r.phone}" onclick="event.stopPropagation()" class="w-10 h-10 bg-rose-600 rounded-full flex items-center justify-center text-white shadow-lg active:scale-90 transition"><i class="fa-solid fa-phone"></i></a></div></div></div>`;
+             let badge = r.isEmergency ? `<div class="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded mb-1 w-fit flex gap-1"><i class="fa-solid fa-triangle-exclamation"></i> EMERGENCY</div>` : `<div class="h-5"></div>`;
+             let statusText = r.status === 'completed' ? `<span class="text-xs text-green-600 font-bold block mt-1">Fulfilled</span>` : "";
+             
+             let actionBtn = "";
+             if (isOwner && r.status === 'active') {
+                actionBtn = `<button onclick="event.stopPropagation(); markRequestComplete('${r.id}')" class="mt-2 text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-bold border border-green-200">Mark as Completed</button>`;
+             }
+
+             return `<div onclick="${fn}" class="blood-card ${r.status} p-4 mb-4 relative cursor-pointer"><div class="flex justify-between items-start"><div>${badge}<h2 class="text-slate-800 font-bold text-lg">Need <span class="text-rose-600 font-black text-2xl">${r.blood}</span></h2><p class="text-slate-600 font-medium text-sm mt-1">${r.patient}</p><div class="flex items-center gap-1 text-slate-500 text-xs mt-3 font-medium"><i class="fa-solid fa-location-dot text-rose-500"></i> ${r.thana}</div>${statusText}${actionBtn}</div><div class="flex flex-col items-end justify-between h-full gap-6"><span class="text-[10px] text-rose-800 font-bold">${date}</span><a href="tel:${r.phone}" onclick="event.stopPropagation()" class="w-10 h-10 bg-rose-600 rounded-full flex items-center justify-center text-white shadow-lg active:scale-90 transition"><i class="fa-solid fa-phone"></i></a></div></div></div>`;
+        }
+
+        async function markRequestComplete(reqId) {
+            if(!confirm("Is this request fulfilled?")) return;
+            await db.collection("requests").doc(reqId).update({ status: 'completed', completedAt: new Date() });
+            showToast("Completed!"); loadUserRequests();
         }
 
         async function loadGlobalRequests() {
-            const s = await db.collection("requests").orderBy("createdAt","desc").limit(20).get();
-            let h = ""; window.feedData = []; s.forEach(d => { window.feedData.push({id:d.id,...d.data()}); });
-            window.feedData.forEach((r,i) => { h += generateReqCard(r,i,true); });
-            const html = h || "<p class='text-center text-gray-400 mt-10'>No requests found</p>";
-            const homeList = document.getElementById('feed-list');
-            if(homeList) homeList.innerHTML = html;
-            const globalList = document.getElementById('feed-list-global');
-            if(globalList) globalList.innerHTML = html;
+            try {
+                const s = await db.collection("requests").limit(50).get();
+                let h = ""; window.feedData = []; 
+                s.forEach(d => { if(d.data().status==='active') window.feedData.push({id:d.id,...d.data()}); });
+                window.feedData.sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+                if(window.feedData.length === 0) { h = "<p class='text-center text-gray-400 mt-10'>No active requests found</p>"; } 
+                else { window.feedData.forEach((r,i) => { h += generateReqCard(r,i,true); }); }
+                const feedEl = document.getElementById('feed-list'); if(feedEl) feedEl.innerHTML = h;
+            } catch (e) { console.error(e); }
         }
 
-        // CHAT UI & LOGIC
+        async function loadCompletedRequests() {
+            try {
+                const s = await db.collection("requests").limit(50).get();
+                let h = ""; window.completedData = []; s.forEach(d => { if(d.data().status==='completed') window.completedData.push({id:d.id,...d.data()}); });
+                window.completedData.sort((a,b) => (b.completedAt?.seconds || 0) - (a.completedAt?.seconds || 0));
+                window.completedData.forEach((r,i) => { h += generateReqCard(r,i,false); });
+                document.getElementById('completed-list').innerHTML = h || "<p class='text-center text-gray-400 mt-10'>No completed requests</p>";
+            } catch(e) { console.error(e); }
+        }
+
+        async function loadUserRequests() { 
+            try {
+                const s=await db.collection("requests").where("createdBy","==",auth.currentUser.uid).get(); 
+                window.userRequestData=[]; s.forEach(d=>window.userRequestData.push({id:d.id, ...d.data()})); 
+                window.userRequestData.sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+                let h=""; window.userRequestData.forEach((r,i)=>h+=generateReqCard(r,i,false, true));
+                document.getElementById('all-requests-list-view').innerHTML=h; 
+            } catch(e) { console.log(e); }
+        }
+
+        // CHAT SYSTEM
         window.backToChats = () => { document.getElementById('page-chat-room').classList.add('hidden'); };
+        
+        async function startChat(targetUid, name, origin, requestId = null) {
+            if(targetUid===auth.currentUser.uid) return;
+            showToast("Opening chat...");
+            
+            let receiverId, donorId;
+            if(origin === 'search') { receiverId = auth.currentUser.uid; donorId = targetUid; }
+            else { receiverId = targetUid; donorId = auth.currentUser.uid; }
 
-        async function startChat(uid, name) {
-            if(uid===auth.currentUser.uid) return;
             const s = await db.collection("chats").where("participants","array-contains",auth.currentUser.uid).get();
-            let cid=null; s.forEach(d=>{if(d.data().participants.includes(uid))cid=d.id});
-            if(!cid) await db.collection("chats").add({participants:[auth.currentUser.uid,uid],participantNames:[currentUserData.name,name],lastMessage:'Started',updatedAt:new Date()});
-            else window.openChat(cid,uid,name);
+            let cid=null; s.forEach(d=>{if(d.data().participants.includes(targetUid))cid=d.id});
+            
+            if(!cid) {
+                const docRef = await db.collection("chats").add({
+                    participants:[auth.currentUser.uid,targetUid],
+                    participantNames:[currentUserData.name,name],
+                    receiverId: receiverId,
+                    donorId: donorId,
+                    lastSenderId: auth.currentUser.uid,
+                    requestId: requestId,
+                    lastMessage:'Started',
+                    isSeen: false,
+                    isCompleted: false,
+                    updatedAt:new Date()
+                });
+                window.openChat(docRef.id, targetUid, name);
+            } else {
+                await db.collection("chats").doc(cid).update({
+                    receiverId: receiverId,
+                    donorId: donorId,
+                    requestId: requestId || firebase.firestore.FieldValue.delete()
+                });
+                window.openChat(cid,targetUid,name);
+            }
         }
-
-        // UPDATED OPEN CHAT (Button Visibility Logic)
+        
         window.openChat = async (cid, uid, name) => {
             activeChatId=cid; activeChatUser=uid;
             document.getElementById('page-chat-room').classList.remove('hidden');
             document.getElementById('chat-user-name').innerText=name;
             
-            const btnConfirm = document.getElementById('btn-confirm-donation');
-            
-            // Logic: ONLY Receiver sees the button
-            // We assume if I am 'receiver' role OR if I started the chat with a 'donor'
-            // For simplicity: If the OTHER person is a DONOR, I see the button.
-            try {
-                const otherUserSnap = await db.collection("users").doc(uid).get();
-                if (otherUserSnap.exists) {
-                    const otherUser = otherUserSnap.data();
-                    if (otherUser.role === 'donor') {
-                        btnConfirm.classList.remove('hidden');
-                    } else {
-                        btnConfirm.classList.add('hidden');
-                    }
-                }
-            } catch(e) { console.log("Error checking role", e); }
-
             const cont=document.getElementById('messages-container');
             db.collection(`chats/${cid}/messages`).orderBy("timestamp","asc").onSnapshot(s=>{
-                let h=""; 
-                s.docChanges().forEach(change => {
-                    if (change.type === "added") {
-                        // NOTIFICATION LOGIC
-                        const m = change.doc.data();
-                        if(m.senderId !== auth.currentUser.uid && document.hidden) {
-                            showNotification("New Message", m.text);
+                let h=""; s.forEach(d=>{ const m=d.data(); const me=m.senderId===auth.currentUser.uid;
+                h+=`<div class="flex flex-col ${me?'items-end':'items-start'}"><div class="my-1 ${me?'chat-bubble-me':'chat-bubble-other'}">${m.text}</div></div>`});
+                cont.innerHTML=h; cont.scrollTop = cont.scrollHeight;
+            });
+
+            // REAL-TIME BUTTON LISTENER
+            db.collection("chats").doc(cid).onSnapshot(chatSnap => {
+                if(chatSnap.exists) {
+                    const d = chatSnap.data();
+                    activeChatRequestId = d.requestId;
+                    if(d.lastSenderId !== auth.currentUser.uid) db.collection("chats").doc(cid).update({ isSeen: true });
+                    
+                    const btnConfirm = document.getElementById('btn-confirm-donation');
+                    const btnVerify = document.getElementById('btn-verify-donation');
+                    
+                    // DEFAULT HIDDEN
+                    btnConfirm.classList.add('hidden');
+                    btnVerify.classList.add('hidden');
+
+                    if(!d.isCompleted) {
+                        if(auth.currentUser.uid === d.receiverId && !d.donationPending) {
+                            btnConfirm.classList.remove('hidden');
+                        }
+                        if(auth.currentUser.uid === d.donorId && d.donationPending) {
+                            btnVerify.classList.remove('hidden');
                         }
                     }
-                });
-                
-                s.forEach(d=>{ const m=d.data(); const me=m.senderId===auth.currentUser.uid;
-                h+=`<div class="flex flex-col ${me?'items-end':'items-start'}"><div class="px-4 py-2 text-sm my-1 ${me?'chat-bubble-me':'chat-bubble-other'}">${m.text}</div></div>`});
-                cont.innerHTML=h; cont.scrollTop = cont.scrollHeight;
+                }
             });
         };
 
         async function loadChatList() {
-            const c = document.getElementById('chat-list-container');
-            if(!c) return;
             db.collection("chats").where("participants","array-contains",auth.currentUser.uid).onSnapshot(s=>{
-                let h=""; s.forEach(d=>{
-                    const dt=d.data(); const oid=dt.participants.find(i=>i!==auth.currentUser.uid); let oname="User";
+                let chats = []; s.forEach(doc => chats.push({id: doc.id, ...doc.data()}));
+                chats.sort((a,b) => b.updatedAt - a.updatedAt);
+                let h=""; chats.forEach(dt => {
+                    const oid=dt.participants.find(i=>i!==auth.currentUser.uid); let oname="User";
                     if(dt.participantNames){const idx=dt.participants.indexOf(auth.currentUser.uid)===0?1:0;oname=dt.participantNames[idx]}
-                    h+=`<div onclick="window.openChat('${d.id}','${oid}','${oname}')" class="bg-white p-4 rounded-2xl mb-2 flex gap-4 cursor-pointer shadow-sm border border-gray-100"><div class="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center text-rose-600 font-bold text-lg">${oname[0]}</div><div class="flex-1"><h4 class="font-bold text-gray-800 text-sm">${oname}</h4><p class="text-xs text-gray-400 truncate">${dt.lastMessage}</p></div></div>`
+                    const isUnread = dt.lastSenderId !== auth.currentUser.uid && dt.isSeen === false;
+                    h+=`<div onclick="window.openChat('${dt.id}','${oid}','${oname}')" class="bg-white p-4 rounded-2xl mb-2 flex gap-4 cursor-pointer shadow-sm border border-gray-100 hover:bg-gray-50 active:scale-95 transition ${isUnread?'highlight-chat':''}"><div class="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center text-rose-600 font-bold text-lg">${oname[0]}</div><div class="flex-1"><h4 class="font-bold text-gray-800 text-sm ${isUnread?'text-rose-600':''}">${oname}</h4><p class="text-xs text-gray-400 truncate ${isUnread?'font-bold text-gray-800':''}">${dt.lastMessage}</p></div></div>`;
                 });
-                c.innerHTML=h || "<p class='text-center text-gray-400 mt-10'>No messages yet</p>";
+                document.getElementById('chat-list-container').innerHTML=h || "<p class='text-center text-gray-400 mt-10'>No messages yet</p>";
             });
         }
-
         async function sendMessage() {
             const i=document.getElementById('msg-input'); if(!i.value)return;
             await db.collection(`chats/${activeChatId}/messages`).add({text:i.value,senderId:auth.currentUser.uid,timestamp:new Date()});
-            await db.collection("chats").doc(activeChatId).update({lastMessage:i.value, updatedAt:new Date()});
+            await db.collection("chats").doc(activeChatId).update({lastMessage:i.value, lastSenderId:auth.currentUser.uid, isSeen: false, updatedAt:new Date()});
             i.value='';
         }
 
-        // CONFIRM DONATION (UPDATED)
-        window.confirmDonation = async () => { 
-            if(!confirm("Did this person donate blood to you? This will reward them coins.")) return;
+        async function initiateDonationConfirm() {
+            if(!confirm("Confirm receiving blood?")) return;
+            await db.collection("chats").doc(activeChatId).update({ donationPending: true, lastMessage: "Waiting for donor verification...", lastSenderId: auth.currentUser.uid, isSeen: false, updatedAt: new Date() });
+            showToast("Sent to donor for verification");
+        }
+
+        async function finalizeDonation() {
+            // IMMEDIATE HIDE
+            document.getElementById('btn-verify-donation').classList.add('hidden');
             
-            toggleLoader('post', true); // Reuse loader style or show toast
             try {
-                // 1. Give Coins to Donor & Update Stats
-                await db.collection("users").doc(activeChatUser).update({
-                    coins: firebase.firestore.FieldValue.increment(50),
-                    donationCount: firebase.firestore.FieldValue.increment(1),
-                    lastDonationDate: new Date(),
-                    available: false // Disable donor
-                });
+                // 1. UPDATE USER
+                await db.collection("users").doc(auth.currentUser.uid).update({ coins: firebase.firestore.FieldValue.increment(50), donationCount: firebase.firestore.FieldValue.increment(1), lastDonationDate: new Date(), available: false });
                 
-                // 2. System Message
-                await db.collection(`chats/${activeChatId}/messages`).add({
-                    text: "🩸 Blood Donation Confirmed! Donor received 50 coins.",
-                    senderId: "SYSTEM",
-                    timestamp: new Date()
-                });
-
-                showToast("Confirmed! Donor rewarded.");
-                document.getElementById('btn-confirm-donation').classList.add('hidden'); // Hide button
-            } catch(e) {
-                showToast("Error processing reward");
-                console.error(e);
+                // 2. CLOSE REQUEST
+                if(activeChatRequestId) await db.collection("requests").doc(activeChatRequestId).update({ status: 'completed', completedAt: new Date() });
+                
+                // 3. UPDATE CHAT (Critical for hiding button permanently)
+                await db.collection("chats").doc(activeChatId).update({ donationPending: false, isCompleted: true, lastMessage: "✅ Donation Verified & Completed!", isSeen: false, updatedAt: new Date() });
+                
+                showToast("Verified! +50 Coins"); 
+            } catch(e) { 
+                showToast("Error: " + e.message); 
+                document.getElementById('btn-verify-donation').classList.remove('hidden'); // Show back if error
             }
-            toggleLoader('post', false);
+        }
+
+        // MODALS & INTERACTION
+        window.startChatFromRequest = async () => { 
+            const req = window.currentModalReq; 
+            if(!req) return; 
+            const status = checkDonationEligibility();
+            if(!status.allowed) { alert(`আপনার রক্ত দানের সময় হয়নি। আপনি আরো ${status.days} দিন পর রক্ত দান করতে পারবেন।`); return; }
+            window.closeRequestModal(); 
+            await startChat(req.createdBy, req.patient || "Requester", 'request', req.id); 
         };
-
-        // NOTIFICATIONS
-        function requestNotifPermission() {
-            if (!("Notification" in window)) return;
-            Notification.requestPermission();
+        
+        function handleCall(phone) {
+            const status = checkDonationEligibility();
+            if(!status.allowed) { alert(`আপনার রক্ত দানের সময় হয়নি। আপনি আরো ${status.days} দিন পর রক্ত দান করতে পারবেন।`); return; }
+            window.location.href = `tel:${phone}`;
         }
-        function showNotification(title, body) {
-            if (Notification.permission === "granted") {
-                new Notification(title, { body: body, icon: 'https://cdn-icons-png.flaticon.com/512/206/206024.png' });
+
+        window.startChatFromModal = async () => { const user = window.currentModalUser; window.closeDonorModal(); await startChat(user.uid, user.name, 'search'); };
+        window.openDonorModal = (i) => { const u=window.currentSearchResults[i]; window.currentModalUser=u; document.getElementById('modal-name').innerText=u.name; document.getElementById('modal-blood').innerText=u.blood; document.getElementById('modal-location').innerText=u.thana; document.getElementById('modal-call-btn').href=`tel:${u.phone}`; document.getElementById('donor-modal').classList.remove('hidden'); };
+        window.closeDonorModal = () => document.getElementById('donor-modal').classList.add('hidden');
+        window.openRequestModal = (i,f) => { 
+            const r=f?window.feedData[i]:window.userRequestData[i]; 
+            window.currentModalReq=r; 
+            document.getElementById('req-modal-blood').innerText=r.blood; 
+            document.getElementById('req-modal-patient').innerText=r.patient; 
+            document.getElementById('req-modal-location').innerText=r.thana; 
+            const callBtn = document.getElementById('req-call-btn');
+            callBtn.onclick = function() { handleCall(r.phone); };
+            callBtn.removeAttribute('href'); 
+            document.getElementById('request-modal').classList.remove('hidden'); 
+        };
+        window.closeRequestModal = () => document.getElementById('request-modal').classList.add('hidden');
+        
+        async function viewChatUserProfile() {
+            try {
+                const snap = await db.collection("users").doc(activeChatUser).get();
+                if(snap.exists) {
+                    const u = snap.data();
+                    document.getElementById('vp-name').innerText = u.name; document.getElementById('vp-blood').innerText = u.blood;
+                    document.getElementById('vp-loc').innerText = u.thana; document.getElementById('vp-donations').innerText = u.donationCount || 0;
+                    document.getElementById('vp-coins').innerText = u.coins || 0;
+                    const achDiv = document.getElementById('vp-achievements'); achDiv.innerHTML = '';
+                    if((u.donationCount||0) >= 1) achDiv.innerHTML += `<span class="text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded-full border border-green-200">🌱 First Blood</span>`;
+                    if((u.donationCount||0) >= 5) achDiv.innerHTML += `<span class="text-[10px] bg-blue-100 text-blue-700 px-2 py-1 rounded-full border border-blue-200">🦸 Hero</span>`;
+                    if((u.coins||0) >= 500) achDiv.innerHTML += `<span class="text-[10px] bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full border border-yellow-200">🪙 Collector</span>`;
+                    if((u.coins||0) >= 2000) achDiv.innerHTML += `<span class="text-[10px] bg-purple-100 text-purple-700 px-2 py-1 rounded-full border border-purple-200">👑 Legend</span>`;
+                    if(achDiv.innerHTML === '') achDiv.innerHTML = '<span class="text-xs text-gray-400">No achievements yet</span>';
+                    document.getElementById('view-profile-modal').classList.remove('hidden');
+                }
+            } catch(e) { showToast("Error loading profile"); }
+        }
+        window.closeViewProfile = () => document.getElementById('view-profile-modal').classList.add('hidden');
+        
+        function loadAchievements() {
+            const list = document.getElementById('achievements-list');
+            const coins = currentUserData ? (currentUserData.coins || 0) : 0;
+            const donations = currentUserData ? (currentUserData.donationCount || 0) : 0;
+            const achievements = [ { title: "First Blood", desc: "Donate once", target: 1, current: donations, icon: "🌱" }, { title: "Hero", desc: "5 donations", target: 5, current: donations, icon: "🦸" }, { title: "Coin Collector", desc: "500 Coins", target: 500, current: coins, icon: "🪙" }, { title: "Legend", desc: "2000 Coins", target: 2000, current: coins, icon: "👑" } ];
+            let html = '';
+            achievements.forEach(ach => {
+                const percent = Math.min(100, Math.floor((ach.current / ach.target) * 100));
+                const isUnlocked = percent === 100;
+                html += `<div class="achievement-card ${isUnlocked ? '' : 'locked'}"><div class="flex items-center gap-4 mb-3"><div class="w-12 h-12 ${isUnlocked ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'} rounded-full flex items-center justify-center text-2xl">${ach.icon}</div><div class="flex-1"><h3 class="font-bold text-gray-800">${ach.title}</h3><p class="text-xs text-gray-500">${ach.desc}</p></div>${isUnlocked ? '<i class="fa-solid fa-check-circle text-green-500 text-xl"></i>' : ''}</div><div class="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden"><div class="h-full ${isUnlocked ? 'bg-green-500' : 'bg-rose-500'} progress-bar-fill" style="width: ${percent}%"></div></div><div class="flex justify-between mt-1"><span class="text-[10px] font-bold text-gray-400">${ach.current} / ${ach.target}</span><span class="text-[10px] font-bold ${isUnlocked ? 'text-green-600' : 'text-rose-600'}">${percent}%</span></div></div>`;
+            });
+            list.innerHTML = html;
+        }
+        async function loadProfile() {
+            if (currentUserData) {
+                document.getElementById('profile-name').innerText = currentUserData.name; document.getElementById('profile-location').innerText = currentUserData.thana;
+                document.getElementById('profile-bg').innerText = currentUserData.blood; document.getElementById('profile-coins').innerText = currentUserData.coins || 0;
+                document.getElementById('profile-donations-count').innerText = currentUserData.donationCount || 0;
+                
+                const toggle = document.getElementById('toggle-availability');
+                const countdownContainer = document.getElementById('countdown-container');
+                const statusText = document.getElementById('status-text-sub');
+
+                if (currentUserData.lastDonationDate) {
+                    const diff = Math.ceil(Math.abs(new Date() - currentUserData.lastDonationDate.toDate()) / (1000 * 60 * 60 * 24));
+                    const rem = 90 - diff;
+                    if (rem > 0) {
+                        toggle.checked = false; toggle.disabled = true;
+                        countdownContainer.classList.remove('hidden'); document.getElementById('countdown-text').innerText = rem + " Days";
+                        statusText.innerText = "Unavailable";
+                    } else {
+                        toggle.disabled = false; toggle.checked = currentUserData.available;
+                        countdownContainer.classList.add('hidden');
+                        statusText.innerText = currentUserData.available ? "Visible" : "Hidden";
+                    }
+                } else {
+                    toggle.disabled = false; toggle.checked = currentUserData.available;
+                    countdownContainer.classList.add('hidden');
+                    statusText.innerText = currentUserData.available ? "Visible" : "Hidden";
+                }
+            }
+        }
+        function requestNotifPermission() { if("Notification" in window) Notification.requestPermission(); }
+        function showNotification(title, body) { if(Notification.permission==="granted" && document.hidden) new Notification(title, {body}); }
+        function showToast(m){const t=document.getElementById('toast');t.innerText=m;t.style.opacity='1';setTimeout(()=>t.style.opacity='0',3000);}
+        function toggleLoader(id, show) { const l=document.getElementById(id+'-loader'); if(l) l.style.display = show ? 'block' : 'none'; }
+        window.switchReqTab = (t) => { if(t==='new'){document.getElementById('view-req-new').classList.remove('hidden');document.getElementById('view-req-all').classList.add('hidden');}else{document.getElementById('view-req-new').classList.add('hidden');document.getElementById('view-req-all').classList.remove('hidden');loadUserRequests();} };
+        
+        // ADMIN PANEL LOGIC
+        function switchAdminTab(t) {
+            if(t==='users') {
+                document.getElementById('adm-view-users').classList.remove('hidden');
+                document.getElementById('adm-view-reqs').classList.add('hidden');
+                document.getElementById('adm-tab-users').classList.add('bg-white','shadow','text-gray-800');
+                document.getElementById('adm-tab-users').classList.remove('text-gray-500');
+                document.getElementById('adm-tab-reqs').classList.remove('bg-white','shadow','text-gray-800');
+                document.getElementById('adm-tab-reqs').classList.add('text-gray-500');
+            } else {
+                document.getElementById('adm-view-users').classList.add('hidden');
+                document.getElementById('adm-view-reqs').classList.remove('hidden');
+                document.getElementById('adm-tab-reqs').classList.add('bg-white','shadow','text-gray-800');
+                document.getElementById('adm-tab-reqs').classList.remove('text-gray-500');
+                document.getElementById('adm-tab-users').classList.remove('bg-white','shadow','text-gray-800');
+                document.getElementById('adm-tab-users').classList.add('text-gray-500');
+                loadAdminRequests();
             }
         }
 
-        // LOGIN/REGISTER
+        async function loadAdminDashboard() {
+            const uSnap = await db.collection('users').get();
+            document.getElementById('stat-users').innerText = uSnap.size;
+            const rSnap = await db.collection('requests').where('status','==','active').get();
+            document.getElementById('stat-reqs').innerText = rSnap.size;
+            
+            const list = document.getElementById('admin-users-list');
+            let h = "";
+            uSnap.forEach(doc => {
+                const u = doc.data();
+                h += `
+                <div class="p-3 flex justify-between items-center">
+                    <div><div class="font-bold text-sm text-gray-800">${u.name}</div><div class="text-xs text-gray-400">${u.email} | ${u.role}</div></div>
+                    ${u.role !== 'admin' ? `<button onclick="adminDeleteUser('${doc.id}')" class="text-red-500 bg-red-50 p-2 rounded hover:bg-red-100"><i class="fa-solid fa-trash"></i></button>` : ''}
+                </div>`;
+            });
+            list.innerHTML = h;
+        }
+
+        async function loadAdminRequests() {
+            const list = document.getElementById('admin-reqs-list');
+            list.innerHTML = "Loading...";
+            const s = await db.collection('requests').limit(50).get();
+            let h = "";
+            s.forEach(doc => {
+                const r = doc.data();
+                h += `
+                <div class="bg-white p-3 rounded-lg border border-gray-100 shadow-sm flex justify-between items-start">
+                    <div>
+                        <span class="text-xs font-bold ${r.status==='active'?'text-green-500':'text-gray-400'} uppercase">${r.status}</span>
+                        <div class="font-bold text-gray-800">Need ${r.blood}</div>
+                        <div class="text-xs text-gray-500">Patient: ${r.patient}</div>
+                    </div>
+                    <div class="flex gap-2">
+                        ${r.status==='active' ? `<button onclick="adminCompleteReq('${doc.id}')" class="text-green-600 bg-green-50 p-2 rounded"><i class="fa-solid fa-check"></i></button>` : ''}
+                        <button onclick="adminDeleteReq('${doc.id}')" class="text-red-500 bg-red-50 p-2 rounded"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>`;
+            });
+            list.innerHTML = h;
+        }
+
+        async function adminDeleteUser(uid) { if(!confirm("Delete this user?")) return; await db.collection('users').doc(uid).delete(); loadAdminDashboard(); }
+        async function adminDeleteReq(rid) { if(!confirm("Delete this request?")) return; await db.collection('requests').doc(rid).delete(); loadAdminRequests(); }
+        async function adminCompleteReq(rid) { await db.collection('requests').doc(rid).update({status:'completed', completedAt:new Date()}); loadAdminRequests(); }
+        
         window.switchAuth = (t) => {
             if(t==='login') { document.getElementById('login-form').classList.remove('hidden'); document.getElementById('register-form').classList.add('hidden'); document.getElementById('tab-login').classList.add('text-rose-600','shadow'); document.getElementById('tab-register').classList.remove('text-rose-600','shadow'); }
             else { document.getElementById('login-form').classList.add('hidden'); document.getElementById('register-form').classList.remove('hidden'); document.getElementById('tab-register').classList.add('text-rose-600','shadow'); document.getElementById('tab-login').classList.remove('text-rose-600','shadow'); }
         };
-        async function handleLogin() {
-            const e=document.getElementById('login-email').value, p=document.getElementById('login-pass').value;
-            toggleLoader('login',true); try { await auth.signInWithEmailAndPassword(e,p); } catch(err){ showToast(err.message); toggleLoader('login',false); }
-        }
-        async function handleRegister() {
-            const n=document.getElementById('reg-name').value, e=document.getElementById('reg-email').value, p=document.getElementById('reg-pass').value;
-            const t=document.getElementById('reg-thana').value, b=document.getElementById('reg-blood').value;
-            const role = document.getElementById('reg-role').value;
-            if(!n||!e||!p||!t) return showToast("Fill fields");
-            toggleLoader('reg',true); try {
-                const c = await auth.createUserWithEmailAndPassword(e,p);
-                await db.collection("users").doc(c.user.uid).set({name:n,email:e,phone:document.getElementById('reg-phone').value,blood:b,role:role,thana:t,uid:c.user.uid,coins:0,badge:"Rookie",donationCount:0,available:true,createdAt:new Date()});
-            } catch(err){ showToast(err.message); toggleLoader('reg',false); }
+        async function handleLogin() { const e=document.getElementById('login-email').value, p=document.getElementById('login-pass').value; document.getElementById('login-loader').classList.remove('hidden'); try{await auth.signInWithEmailAndPassword(e,p);}catch(e){showToast(e.message);} document.getElementById('login-loader').classList.add('hidden'); }
+        async function handleRegister() { 
+            const n=document.getElementById('reg-name').value, e=document.getElementById('reg-email').value, p=document.getElementById('reg-pass').value, b=document.getElementById('reg-blood').value, t=document.getElementById('reg-thana').value, role=document.getElementById('reg-role').value;
+            document.getElementById('reg-loader').classList.remove('hidden');
+            try { const c=await auth.createUserWithEmailAndPassword(e,p); await db.collection("users").doc(c.user.uid).set({name:n,email:e,phone:document.getElementById('reg-phone').value,blood:b,role:role,thana:t,uid:c.user.uid,coins:0,available:true,createdAt:new Date()}); }catch(e){showToast(e.message);} 
+            document.getElementById('reg-loader').classList.add('hidden');
         }
         window.handleLogout = () => auth.signOut().then(()=>location.reload());
-
-        // SEARCH
-        async function searchDonors() {
-            const thana=document.getElementById('search-thana').value, blood=document.getElementById('search-blood').value;
-            document.getElementById('donors-list').innerHTML = "<div class='loader-inline'></div>";
-            const s = await db.collection("users").where("role","==","donor").get();
-            let res = []; s.forEach(doc => { 
-                const u=doc.data(); 
-                // Don't show unavailable donors in search result ideally, or show them as inactive
-                if(u.available && (blood==="All"||u.blood===blood) && (!thana||u.thana===thana)) res.push(u); 
-            });
-            window.currentSearchResults = res;
-            let h = ""; res.forEach((u,i) => { h += `<div onclick="window.openDonorModal(${i})" class="bg-white p-4 rounded-2xl shadow-sm mb-2 cursor-pointer flex justify-between border border-gray-100"><div><b>${u.name}</b><br><span class="text-xs text-rose-500 font-bold">${u.blood}</span> <span class="text-xs text-gray-400">| ${u.thana}</span></div><div class="text-xs bg-yellow-50 text-yellow-600 px-2 py-1 rounded h-fit font-bold">⭐ ${u.coins||0}</div></div>`; });
-            document.getElementById('donors-list').innerHTML = h || "<p class='text-center text-gray-400'>No available donors found</p>";
-        }
-
-        // UTILS
-        function showToast(m){const t=document.getElementById('toast');t.innerText=m;t.style.opacity='1';setTimeout(()=>t.style.opacity='0',3000);}
-        function toggleLoader(id, show) { const l=document.getElementById(id+'-loader'); if(l) l.style.display = show ? 'block' : 'none'; }
-        
-        // BINDINGS
-        window.switchReqTab = (t) => { if(t==='new'){document.getElementById('view-req-new').classList.remove('hidden');document.getElementById('view-req-all').classList.add('hidden');}else{document.getElementById('view-req-new').classList.add('hidden');document.getElementById('view-req-all').classList.remove('hidden');loadUserRequests();} };
-        async function loadUserRequests() { const l=document.getElementById('all-requests-list-view'); const s=await db.collection("requests").where("createdBy","==",auth.currentUser.uid).get(); window.userRequestData=[]; s.forEach(d=>window.userRequestData.push(d.data())); let h=""; window.userRequestData.forEach((r,i)=>h+=generateReqCard(r,i,false)); l.innerHTML=h; };
-        
-        window.startChatFromRequest = () => { startChat(window.currentModalReq.createdBy, "Requester"); window.closeRequestModal(); };
-        window.startChatFromModal = () => { startChat(window.currentModalUser.uid, window.currentModalUser.name); window.closeDonorModal(); };
-        window.openDonorModal = (i) => { const u=window.currentSearchResults[i]; window.currentModalUser=u; document.getElementById('modal-name').innerText=u.name; document.getElementById('modal-blood').innerText=u.blood; document.getElementById('modal-location').innerText=u.thana; document.getElementById('modal-call-btn').href=`tel:${u.phone}`; document.getElementById('donor-modal').classList.remove('hidden'); };
-        window.closeDonorModal = () => document.getElementById('donor-modal').classList.add('hidden');
-        window.openRequestModal = (i,f) => { const r=f?window.feedData[i]:window.userRequestData[i]; window.currentModalReq=r; document.getElementById('req-modal-blood').innerText=r.blood; document.getElementById('req-modal-patient').innerText=r.patient; document.getElementById('req-modal-location').innerText=r.thana; document.getElementById('req-modal-call').href=`tel:${r.phone}`; document.getElementById('request-modal').classList.remove('hidden'); };
-        window.closeRequestModal = () => document.getElementById('request-modal').classList.add('hidden');
     </script>
 </body>
 </html>
